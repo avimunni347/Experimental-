@@ -8,14 +8,14 @@ jobs:
     runs-on: windows-2019
     timeout-minutes: 9999
     steps:
-      - name: Download Ngrok and scripts.
+      - name: Download Ngrok and scripts
         run: |
           Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
           Invoke-WebRequest https://raw.githubusercontent.com/Riders004/rdp/master/start.bat -OutFile start.bat
           Invoke-WebRequest https://raw.githubusercontent.com/Riders004/rdp/master/download1.jpeg -OutFile wallpaper.bat
           Invoke-WebRequest https://raw.githubusercontent.com/Vip3rLi0n/Ngrok-RDPs/main/resources/loop.ps1 -OutFile loop.ps1
 
-      - name: Extract ngrok
+      - name: Extract Ngrok
         run: Expand-Archive ngrok.zip
 
       - name: Connect Ngrok
@@ -31,10 +31,17 @@ jobs:
           copy wallpaper.bat D:\a\wallpaper.bat
 
       - name: Start Ngrok tunnel
-        run: Start-Process Powershell -ArgumentList '-Noexit -Command "./ngrok/ngrok.exe tcp --region ap 3389"'
+        run: |
+          ./ngrok/ngrok.exe tcp --region ap 3389 > ngrok_log.txt &
+          Start-Sleep -Seconds 5
+          Invoke-RestMethod http://127.0.0.1:4040/api/tunnels | ConvertTo-Json -Depth 5
 
       - name: Start RDP session
-        run: cmd /c start.bat
+        run: |
+          cmd /c start.bat
+          echo Username: administrator
+          echo Password: OLDUSER#6
 
       - name: Keep session alive
         run: ./loop.ps1
+        
