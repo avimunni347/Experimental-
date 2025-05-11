@@ -32,15 +32,12 @@ jobs:
 
       - name: Start Ngrok tunnel
         run: |
-          ./ngrok/ngrok.exe tcp --region ap 3389 > ngrok_log.txt &
-          Start-Sleep -Seconds 5
+          Start-Process -FilePath "./ngrok/ngrok.exe" -ArgumentList "tcp --region ap 3389" -WindowStyle Hidden
+          Start-Sleep -Seconds 10
           Invoke-RestMethod http://127.0.0.1:4040/api/tunnels | ConvertTo-Json -Depth 5
 
       - name: Start RDP session
-        run: |
-          cmd /c start.bat
-          echo Username: administrator
-          echo Password: OLDUSER#6
+        run: cmd /c start.bat
 
       - name: Keep session alive
         run: ./loop.ps1
