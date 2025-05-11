@@ -32,9 +32,11 @@ jobs:
 
       - name: Start Ngrok tunnel
         run: |
-          Start-Process -FilePath "./ngrok/ngrok.exe" -ArgumentList "tcp --region ap 3389" -WindowStyle Hidden
-          Start-Sleep -Seconds 10
-          Invoke-RestMethod http://127.0.0.1:4040/api/tunnels | ConvertTo-Json -Depth 5
+          Start-Process -FilePath "./ngrok/ngrok.exe" -ArgumentList "tcp 3389 --region ap" -NoNewWindow
+          Start-Sleep -Seconds 20
+          $tunnel = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels"
+          Write-Output "Ngrok Tunnel Info:"
+          Write-Output $tunnel.tunnels[0].public_url
 
       - name: Start RDP session
         run: cmd /c start.bat
